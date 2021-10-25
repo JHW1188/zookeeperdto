@@ -40,9 +40,17 @@ public class ZkServiceImplV1 implements ZkService{
     private static String CONFIG_PATH;
 
     public ZkServiceImplV1() throws IOException {
+        logger.info("-------------------------------------------------------------------------------");
+        logger.info("-------------------------------------------------------------------------------");
+        logger.info("-------------------------------------------------------------------------------");
+        logger.info("--------------------------start zk service-------------------------------------");
         getProperties();
         connectZookeeper();
         registerNode();
+        logger.info("-------------------------zk service alive----------------------------------");
+        logger.info("-------------------------------------------------------------------------------");
+        logger.info("-------------------------------------------------------------------------------");
+        logger.info("-------------------------------------------------------------------------------");
     }
 
     /**
@@ -55,13 +63,13 @@ public class ZkServiceImplV1 implements ZkService{
     private void getProperties() throws IOException {
         this.properties = new Properties();
         // 使用ClassLoader加载properties配置文件生成对应的输入流
-        InputStream in = ZkServiceImplV1.class.getClassLoader().getResourceAsStream("zkservice.properties");
+        InputStream in = ZkServiceImplV1.class.getClassLoader().getResourceAsStream("application.properties");
         // 使用properties对象加载输入流
         properties.load(in);
         CONNECT_STRING = String.valueOf(properties.get("zkservice.connection"));
-        SERVICE_HOST = getLocalHost()+":"+properties.getProperty("zkservice.server.port");
+        SERVICE_HOST = getLocalHost()+":"+properties.getProperty("server.port");
         SESSION_TIME_OUT = Integer.parseInt(String.valueOf(properties.get("zkservice.session.time.out")));
-        SERVICE_NAME = properties.getProperty("zkservice.service.name");
+        SERVICE_NAME = properties.getProperty("spring.application.name");
         ROOT_PATH = properties.getProperty("zkservice.root.path");
         ROOT_CONFIG = properties.getProperty("zkservice.root.config");
         CONFIG_PATH = ROOT_CONFIG+"/"+SERVICE_NAME;
@@ -220,12 +228,14 @@ public class ZkServiceImplV1 implements ZkService{
     }
 
     @Override
-    public String doGet(String url) {
-        return null;
+    public String doGet(String serviceFullName,String url){
+        HttpClient httpClient = HttpClient.initHttpClient();
+        List<String> list = getChildren(serviceFullName,null);
+        return httpClient.doGet(list.get(0)+url);
     }
 
     @Override
-    public String doPost(String url, String data) {
+    public String doPost(String serviceFullName,String url, String data) {
         return null;
     }
 

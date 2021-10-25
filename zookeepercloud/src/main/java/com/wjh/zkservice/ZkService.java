@@ -42,7 +42,7 @@ public interface ZkService {
     @Deprecated
     void deleteLockNode(String path);
 
-    String doGet(String url);
+    String doGet(String serviceFullName,String url);
 
-    String doPost(String url,String data);
+    String doPost(String serviceFullName,String url,String data);
 }
